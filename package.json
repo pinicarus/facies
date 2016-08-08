@@ -1,0 +1,39 @@
+{
+  "name": "facies",
+  "version": "1.0.0",
+  "description": "A featureful function parameters signature module",
+  "main": "src/index.js",
+  "scripts": {
+    "doc": "jsdoc2md --heading-depth 1 --src src/**.js > API.md",
+    "lint": "eslint . --ignore-path .gitignore",
+    "unittest": "mocha --check-leaks --require ./alias --recursive test",
+    "unitcov": "istanbul cover -x 'examples/**' --include-all-sources --report lcovonly -- _mocha --reporter spec --check-leaks --require ./alias --recursive test",
+    "pretest": "npm run lint",
+    "test": "npm run unitcov",
+    "posttest": "cat coverage/lcov.info | coveralls"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pinicarus/facies.git"
+  },
+  "keywords": [
+    "overloading",
+    "signature",
+    "parameters",
+    "arguments",
+    "type-checking"
+  ],
+  "author": "Pierre-Nicolas Clauss",
+  "license": "WTFPL",
+  "bugs": {
+    "url": "https://github.com/pinicarus/facies/issues"
+  },
+  "homepage": "https://github.com/pinicarus/facies#readme",
+  "devDependencies": {
+    "coveralls": "^2.11.9",
+    "eslint": "^3.0.0",
+    "istanbul": "^0.4.4",
+    "jsdoc-to-markdown": "^1.3.6",
+    "mocha": "^2.5.3"
+  }
+}

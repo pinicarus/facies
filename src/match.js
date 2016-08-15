@@ -22,8 +22,8 @@ const match = function match(values, definitions, strict) {
   const parameters = definitions.map((definition) => {
     const values = assertType(TypeDefinition, definition).match(pending);
 
-    pending.splice(0, values.length);
-    return values.length > 1 ? values : values[0];
+    pending.splice(0, values[0]);
+    return values[1].length > 1 ? values[1] : values[1][0];
   });
 
   if (strict && pending.length > 0) {

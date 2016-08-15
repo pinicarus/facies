@@ -11,32 +11,35 @@ describe("TypeDefinition", function () {
 
     assert.doesNotThrow(() => new TypeDefinition(Object, {}, 1));
     assert.throws(() => new TypeDefinition(Object, {}, "a"), TypeError);
+
+    assert.throws(() => new TypeDefinition(Object, {}, -1), TypeError);
+    assert.throws(() => new TypeDefinition(Object, {}).match(1), TypeError);
   });
 
   it("should match no value", function () {
     const typedef = new TypeDefinition(Object, {}, 0);
 
-    assert.deepEqual(typedef.match([1, "a", true]), []);
+    assert.deepEqual(typedef.match([1, "a", true]), [0, []]);
   });
 
   it("should match single value", function () {
     const typedef = new TypeDefinition(Object, [], 1);
 
-    assert.deepEqual(typedef.match(["a"]), [[]]);
-    assert.deepEqual(typedef.match([{}]),  [{}]);
+    assert.deepEqual(typedef.match(["a"]), [0, [[]]]);
+    assert.deepEqual(typedef.match([{}]),  [1, [{}]]);
   });
 
   it("should match multiple values", function () {
     const typedef = new TypeDefinition(Object, {}, 2);
 
-    assert.deepEqual(typedef.match([{a: 1}, 1, {b: 2}]), [{a: 1}, {}]);
+    assert.deepEqual(typedef.match([{a: 1}, 1, {b: 2}]), [1, [{a: 1}, {}]]);
   });
 
   it("should match default value", function () {
     const typedef = new TypeDefinition(Object, {a: 1});
 
-    assert.deepEqual(typedef.match([]), [{a: 1}]);
-    assert.deepEqual(typedef.match(["a"]), [{a: 1}]);
+    assert.deepEqual(typedef.match([]), [0, [{a: 1}]]);
+    assert.deepEqual(typedef.match(["a"]), [0, [{a: 1}]]);
   });
 
   it("should reject wrongly typed value", function () {

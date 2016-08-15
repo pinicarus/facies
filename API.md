@@ -16,7 +16,7 @@ Constructs a new type definition.
 
 **Throws**:
 
-- <code>TypeError</code> Whenever count is not a number.
+- <code>TypeError</code> Whenever count is not a positive number.
 - <code>TypeError</code> Whenever value is given and wrongly typed.
 
 

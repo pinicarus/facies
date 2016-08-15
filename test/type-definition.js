@@ -11,6 +11,8 @@ describe("TypeDefinition", function () {
 
     assert.doesNotThrow(() => new TypeDefinition(Object, {}, 1));
     assert.throws(() => new TypeDefinition(Object, {}, "a"), TypeError);
+
+    assert.throws(() => new TypeDefinition(Object, {}, -1), TypeError);
   });
 
   it("should match no value", function () {

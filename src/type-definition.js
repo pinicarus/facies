@@ -18,7 +18,7 @@ const TypeDefinition = class TypeDefinition {
    * @param {*}      [value]   - The default value for optional parameters.
    * @param {Number} [count=1] - The number of values to match.
    *
-   * @throws {TypeError} Whenever count is not a number.
+   * @throws {TypeError} Whenever count is not a positive number.
    * @throws {TypeError} Whenever value is given and wrongly typed.
    */
   constructor(type, value, count) {
@@ -26,6 +26,9 @@ const TypeDefinition = class TypeDefinition {
     this[_type]     = type;
     this[_default]  = !this[_required]    ? assertType(type, value)   : value;
     this[_count]    = count !== undefined ? assertType(Number, count) : 1;
+    if (this[_count] < 0) {
+      throw new TypeError("negative count");
+    }
   }
 
   /**

@@ -64,4 +64,14 @@ describe("match", function () {
       new TypeDefinition(Object),
     ], true), TypeError);
   });
+
+  it("should allow optional values everywhere", function () {
+    assert.deepEqual(match([1, "a", "b", 2], [
+      new TypeDefinition(RegExp, /^x$/),
+      new TypeDefinition(Number),
+      new TypeDefinition(String, "c", 3),
+      new TypeDefinition(Array, [true]),
+      new TypeDefinition(Number),
+    ], true), [/^x$/, 1, ["a", "b", "c"], [true], 2]);
+  });
 });

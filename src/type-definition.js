@@ -18,14 +18,19 @@ const TypeDefinition = class TypeDefinition {
    * @param {*}      [value]   - The default value for optional parameters.
    * @param {Number} [count=1] - The number of values to match.
    *
-   * @throws {TypeError} Whenever count is not a number.
+   * @throws {TypeError} Whenever count is not a positive number.
    * @throws {TypeError} Whenever value is given and wrongly typed.
    */
   constructor(type, value, count) {
     this[_required] = arguments.length < 2;
     this[_type]     = type;
-    this[_default]  = !this[_required]    ? assertType(type, value)   : value;
+    this[_default]  = !this[_required] && value !== null
+                    ? assertType(type, value)
+                    : value;
     this[_count]    = count !== undefined ? assertType(Number, count) : 1;
+    if (this[_count] < 0) {
+      throw new TypeError("negative count");
+    }
   }
 
   /**
@@ -37,29 +42,30 @@ const TypeDefinition = class TypeDefinition {
    * @throws  {TypeError} Whenever matching cannot fulfill the definition.
    */
   match(values) {
-    if (this[_count] <= 0) {
-      return [];
-    }
-
-    const matched = Array.from(new Array(this[_count])).map((_, index) => {
+    assertType(Array, values);
+    return Array.from(new Array(this[_count])).reduce((matched, _, index) => {
       if (values.length <= index) {
         if (this[_required]) {
           throw new TypeError("missing value");
         }
-        return this[_default];
+        matched[1].push(this[_default]);
+        return matched;
       }
 
       try {
-        return assertType(this[_type], values[index]);
+        const value = assertType(this[_type], values[index]);
+
+        ++matched[0];
+        matched[1].push(value);
+        return matched;
       } catch(error) {
         if (error instanceof TypeError && !this[_required]) {
-          return this[_default];
+          matched[1].push(this[_default]);
+          return matched;
         }
         throw error;
       }
-    });
-
-    return matched;
+    }, [0, []]);
   }
 };
 

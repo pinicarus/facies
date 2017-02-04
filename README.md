@@ -46,10 +46,12 @@ const target = function () {
 ```
 
 It works by matching the given values against a list of type definitions.
-Type definitions are constructor from a type constructor. Optional, they may be
-followed by a default value in case no actual value can be matched. Default
-values must be `null` or match the type constructor or `facies.match` will
-throw a `TypeError`.
+Type definitions are constructed from a type constructor for exact matching or
+from an array of type constructors to match on of any types.
+
+Optionally, they may be followed by a default value in case no actual value can
+be matched. Default values must be `null` or match the type constructor or
+`facies.match` will throw a `TypeError`.
 
 If actual values do not match the expected type definition, `facies.match` will
 also throw a `TypeError`.

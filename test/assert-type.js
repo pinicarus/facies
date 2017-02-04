@@ -40,9 +40,16 @@ describe("assertType", function () {
 		assert.doesNotThrow(() => assertType(Object,   new Date()));
 	});
 
+	it("should match multiple types", function () {
+		assert.doesNotThrow(() => assertType([Number, String, RegExp], 1));
+		assert.doesNotThrow(() => assertType([Number, String, RegExp], "a"));
+		assert.doesNotThrow(() => assertType([Number, String, RegExp], /^a$/));
+	});
+
 	it("should reject wrongly typed values", function () {
 		assert.throws(() => assertType(undefined, null), TypeError);
 		assert.throws(() => assertType(Object,    1), TypeError);
 		assert.throws(() => assertType(Array,     {}), TypeError);
+		assert.throws(() => assertType([Number, String], true), TypeError);
 	});
 });

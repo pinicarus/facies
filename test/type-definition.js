@@ -35,6 +35,12 @@ describe("TypeDefinition", function () {
 		assert.deepEqual(typedef.match([{a: 1}, 1, {b: 2}]), [1, [{a: 1}, {}]]);
 	});
 
+	it("should match multiple types", function () {
+		const typedef = new TypeDefinition([Number, String], null, 2);
+
+		assert.deepEqual(typedef.match(["a", 1]), [2, ["a", 1]]);
+	});
+
 	it("should match default value", function () {
 		const typedef = new TypeDefinition(Object, {a: 1});
 
@@ -44,6 +50,7 @@ describe("TypeDefinition", function () {
 
 	it("should reject wrongly typed value", function () {
 		assert.throws(() => new TypeDefinition(Object).match([1]), TypeError);
+		assert.throws(() => new TypeDefinition([Number, String]).match([{}]), TypeError);
 	});
 
 	it("should reject missing value", function () {

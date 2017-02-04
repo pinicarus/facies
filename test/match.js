@@ -22,6 +22,11 @@ describe("match", function () {
 			new TypeDefinition(Object),
 		], true), [1, "a", {b: true}]);
 
+		assert.deepEqual(match([1, "a"], [
+			new TypeDefinition([Number, String]),
+			new TypeDefinition([Number, String]),
+		], true), [1, "a"]);
+
 		assert.deepEqual(match([1, 2, 3], [
 			new TypeDefinition(Number, 0, 3),
 		], true), [[1, 2, 3]]);
@@ -42,6 +47,11 @@ describe("match", function () {
 			new TypeDefinition(String),
 			new TypeDefinition(Object),
 		], false), [1, "a", {b: true}, /^x$/]);
+
+		assert.deepEqual(match([1, "a", /^x$/], [
+			new TypeDefinition([Number, String]),
+			new TypeDefinition([Number, String]),
+		], false), [1, "a", /^x$/]);
 
 		assert.deepEqual(match([1, 2], [
 			new TypeDefinition(Number, 0, 3),
@@ -73,5 +83,9 @@ describe("match", function () {
 			new TypeDefinition(Array, [true]),
 			new TypeDefinition(Number),
 		], true), [/^x$/, 1, ["a", "b", "c"], [true], 2]);
+
+		assert.deepEqual(match([1, "a"], [
+			new TypeDefinition([Number, String], 2, 3),
+		], true), [[1, "a", 2]]);
 	});
 });

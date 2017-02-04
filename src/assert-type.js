@@ -18,8 +18,8 @@ const types = {
  * Verifies the type of a value.
  * @private
  *
- * @param {*} expected - The value expected type.
- * @param {*} value    - The value to verify the type of.
+ * @param {(*|Array<*>)} expected - The value expected type(s).
+ * @param {*}            value    - The value to verify the type of.
  *
  * @returns {*}         The value.
  * @throws  {TypeError} Whenever the value is wrongly typed.
@@ -27,7 +27,12 @@ const types = {
 const assertType = function assertType (expected, value) {
 	const actual = value === null ? null : types[typeof value];
 
-	if (actual === expected || value instanceof expected) {
+	if (Array.isArray(expected)) {
+		if (expected.some((type) => actual === type || value instanceof type)) {
+			return value;
+		}
+	}
+	else if (actual === expected || value instanceof expected) {
 		return value;
 	}
 	throw new TypeError("wrong type");

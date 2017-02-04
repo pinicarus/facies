@@ -1,72 +1,80 @@
 "use strict";
 
-const assertType = require("./assert-type");
-
-const _required = Symbol("required");
-const _type     = Symbol("type");
-const _count    = Symbol("count");
-const _default  = Symbol("default");
+const {assertType} = require("./assert-type");
 
 /**
- * Parameter type filtering definition.
+ * Storeage for the internal properties for TypeDefinition instances.
+ * @private
+ * @type {WeakMap}
+ */
+const properties = new WeakMap();
+
+/**
+ * A parameter type filtering definition.
  */
 const TypeDefinition = class TypeDefinition {
-  /**
-   * Constructs a new type definition.
-   *
-   * @param {*}      type      - The type to match parameters against.
-   * @param {*}      [value]   - The default value for optional parameters.
-   * @param {Number} [count=1] - The number of values to match.
-   *
-   * @throws {TypeError} Whenever count is not a positive number.
-   * @throws {TypeError} Whenever value is given and wrongly typed.
-   */
-  constructor(type, value, count) {
-    this[_required] = arguments.length < 2;
-    this[_type]     = type;
-    this[_default]  = !this[_required] && value !== null
-                    ? assertType(type, value)
-                    : value;
-    this[_count]    = count !== undefined ? assertType(Number, count) : 1;
-    if (this[_count] < 0) {
-      throw new TypeError("negative count");
-    }
-  }
+	/**
+	 * Constructs a new type definition.
+	 *
+	 * @param {*}      type         - The type to match parameters against.
+	 * @param {*}      [value=null] - The default value for optional parameters.
+	 * @param {Number} [count=1]    - The number of values to match.
+	 *
+	 * @throws {TypeError} Whenever count is not a positive number.
+	 * @throws {TypeError} Whenever value is given and wrongly typed.
+	 */
+	constructor(type, value = null, count = 1) {
+		const required = arguments.length < 2;
 
-  /**
-   * Matches a list of values against the definition.
-   *
-   * @param {Array} values - The list of values to match agains the definition.
-   *
-   * @returns {Array}     The matched or default values.
-   * @throws  {TypeError} Whenever matching cannot fulfill the definition.
-   */
-  match(values) {
-    assertType(Array, values);
-    return Array.from(new Array(this[_count])).reduce((matched, _, index) => {
-      if (values.length <= index) {
-        if (this[_required]) {
-          throw new TypeError("missing value");
-        }
-        matched[1].push(this[_default]);
-        return matched;
-      }
+		assertType(Number, count);
+		if (count < 0) {
+			throw new TypeError("negative count");
+		}
+		properties.set(this, {
+			required,
+			type,
+			count,
+			defaultValue: value !== null ? assertType(type, value) : value,
+		});
+	}
 
-      try {
-        const value = assertType(this[_type], values[index]);
+	/**
+	 * Matches a list of values against the definition.
+	 * @private
+	 *
+	 * @param {Array<*>} values - The list of values to match agains the definition.
+	 *
+	 * @returns {Array<*>}  The matched or default values.
+	 * @throws  {TypeError} Whenever matching cannot fulfill the definition.
+	 */
+	match(values) {
+		const {count, required, type, defaultValue} = properties.get(this);
 
-        ++matched[0];
-        matched[1].push(value);
-        return matched;
-      } catch(error) {
-        if (error instanceof TypeError && !this[_required]) {
-          matched[1].push(this[_default]);
-          return matched;
-        }
-        throw error;
-      }
-    }, [0, []]);
-  }
+		assertType(Array, values);
+		return Array.from(new Array(count)).reduce((matched, _, index) => {
+			if (values.length <= index) {
+				if (required) {
+					throw new TypeError("missing value");
+				}
+				matched[1].push(defaultValue);
+				return matched;
+			}
+
+			try {
+				const value = assertType(type, values[index]);
+
+				++matched[0];
+				matched[1].push(value);
+				return matched;
+			} catch(error) {
+				if (error instanceof TypeError && !required) {
+					matched[1].push(defaultValue);
+					return matched;
+				}
+				throw error;
+			}
+		}, [0, []]);
+	}
 };
 
-module.exports = TypeDefinition;
+module.exports = {TypeDefinition};

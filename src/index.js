@@ -1,7 +1,9 @@
 "use strict";
 
-module.exports = Object.freeze({
-  match: require("./match"),
+const {TypeDefinition} = require("./type-definition");
+const {match}          = require("./match");
 
-  TypeDefinition: require("./type-definition"),
+module.exports = Object.freeze({
+	TypeDefinition,
+	match,
 });

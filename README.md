@@ -1,7 +1,6 @@
 # Facies
 
-`facies` is a featureful parameters signature module for
-[nodejs](https://nodejs.org).
+`facies` is a featureful parameters signature module for [nodejs](https://nodejs.org).
 
 [![NPM Summary](https://nodei.co/npm/facies.png)](https://www.npmjs.com/package/facies)
 [![NPM Downloads](https://nodei.co/npm-dl/facies.png?months=1)](https://www.npmjs.com/package/facies)
@@ -20,7 +19,7 @@ See the [changelog](https://github.com/pinicarus/facies/blob/master/CHANGELOG.md
 
 ## Requirements
 
-`facies` works with NodeJS 4.x and above. Install it the usual way:
+`facies` works with NodeJS 6.x and above. Install it the usual way:
 
 ```
 npm install facies
@@ -35,22 +34,24 @@ keyword:
 const facies = require("facies");
 
 const target = function () {
-  const parameters = facies.match(arguments, [
-    new facies.TypeDefinition(Number),
-	 new facies.TypeDefinition(String, "a"),
-  ]);
+	const parameters = facies.match(arguments, [
+		new facies.TypeDefinition(Number),
+		new facies.TypeDefinition(String, "a"),
+	]);
 
-  // parameters is an array:
-  // - [0] is a Number
-  // - [1] is a string with default value "a"
+	// parameters is an array:
+	// - [0] is a Number
+	// - [1] is a string with default value "a"
 };
 ```
 
 It works by matching the given values against a list of type definitions.
-Type definitions are constructor from a type constructor. Optional, they may be
-followed by a default value in case no actual value can be matched. Default
-values must be `null` or match the type constructor or `facies.match` will
-throw a `TypeError`.
+Type definitions are constructed from a type constructor for exact matching or
+from an array of type constructors to match on of any types.
+
+Optionally, they may be followed by a default value in case no actual value can
+be matched. Default values must be `null` or match the type constructor or
+`facies.match` will throw a `TypeError`.
 
 If actual values do not match the expected type definition, `facies.match` will
 also throw a `TypeError`.

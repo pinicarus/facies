@@ -1,3 +1,8 @@
+# 2.0.0
+  - Drop support of Node 4.x
+  - Allow matching of variadic types
+  - Allow matching of object templates
+
 # 1.1.0
 
   - Allow optional values in all positions

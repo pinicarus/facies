@@ -1,12 +1,17 @@
 "use strict";
 
+/**
+ * A mapping of type names to types.
+ * @private
+ * @enum {*}
+ */
 const types = {
-  "undefined": undefined,
-  "boolean":   Boolean,
-  "function":  Function,
-  "number":    Number,
-  "string":    String,
-  "symbol":    Symbol,
+	"undefined": undefined,
+	"boolean":   Boolean,
+	"function":  Function,
+	"number":    Number,
+	"string":    String,
+	"symbol":    Symbol,
 };
 
 /**
@@ -20,12 +25,12 @@ const types = {
  * @throws  {TypeError} Whenever the value is wrongly typed.
  */
 const assertType = function assertType (expected, value) {
-  const actual = value === null ? null : types[typeof value];
-  
-  if (actual === expected || value instanceof expected) {
-    return value;
-  }
-  throw new TypeError("wrong type");
+	const actual = value === null ? null : types[typeof value];
+
+	if (actual === expected || value instanceof expected) {
+		return value;
+	}
+	throw new TypeError("wrong type");
 };
 
-module.exports = assertType;
+module.exports = {assertType};

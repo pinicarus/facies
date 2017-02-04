@@ -9,7 +9,6 @@ const {assertType}     = require("./assert-type");
  * the iterable.
  */
 
-
 /**
  * Filters optional and required parameters.
  * Missing optional parameters will be replaced by `undefined'.

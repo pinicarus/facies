@@ -40,9 +40,47 @@ describe("assertType", function () {
 		assert.doesNotThrow(() => assertType(Object,   new Date()));
 	});
 
+	it("should match multiple types", function () {
+		assert.doesNotThrow(() => assertType([Number, String, RegExp], 1));
+		assert.doesNotThrow(() => assertType([Number, String, RegExp], "a"));
+		assert.doesNotThrow(() => assertType([Number, String, RegExp], /^a$/));
+	});
+
+	it("should match object templates", function () {
+		const template = {
+			a: Number,
+			b: [Boolean, String],
+			c: {
+				d: RegExp,
+				e: [Date, Function],
+			},
+		};
+
+		assert.doesNotThrow(() => assertType(template, {
+			a: 1,
+			b: true,
+			c: {
+				d: /^a$/,
+				e: new Date(),
+			},
+		}));
+		assert.doesNotThrow(() => assertType(template, {
+			a: 1,
+			b: "x",
+			c: {
+				d: /^a$/,
+				e: () => {},
+			},
+		}));
+	});
+
 	it("should reject wrongly typed values", function () {
 		assert.throws(() => assertType(undefined, null), TypeError);
 		assert.throws(() => assertType(Object,    1), TypeError);
 		assert.throws(() => assertType(Array,     {}), TypeError);
+		assert.throws(() => assertType([Number, String], true), TypeError);
+		assert.throws(() => assertType({a: Number}, true), TypeError);
+		assert.throws(() => assertType({a: Number}, {}), TypeError);
+		assert.throws(() => assertType({a: Number}, {b: 1}), TypeError);
 	});
 });

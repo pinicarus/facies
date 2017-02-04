@@ -1,5 +1,8 @@
 "use strict";
 
+const isPlainObject   = require("is-plain-obj");
+const {mapObjIndexed} = require("ramda");
+
 /**
  * A mapping of type names to types.
  * @private
@@ -15,16 +18,16 @@ const types = {
 };
 
 /**
- * Verifies the type of a value.
+ * Verifies the type of a primitive value.
  * @private
  *
- * @param {(*|Array<*>)} expected - The value expected type(s).
- * @param {*}            value    - The value to verify the type of.
+ * @param {*} expected - The value expected type(s).
+ * @param {*} value    - The value to verify the type of.
  *
  * @returns {*}         The value.
  * @throws  {TypeError} Whenever the value is wrongly typed.
  */
-const assertType = function assertType (expected, value) {
+const assertPrimitive = function assertPrimitive(expected, value) {
 	const actual = value === null ? null : types[typeof value];
 
 	if (Array.isArray(expected)) {
@@ -36,6 +39,23 @@ const assertType = function assertType (expected, value) {
 		return value;
 	}
 	throw new TypeError("wrong type");
+};
+
+/**
+ * Verifies the type of a value.
+ * @private
+ *
+ * @param {*} expected - The value expected type(s).
+ * @param {*} value    - The value to verify the type of.
+ *
+ * @returns {*}         The value.
+ * @throws  {TypeError} Whenever the value is wrongly typed.
+ */
+const assertType = function assertType (expected, value) {
+	if (!isPlainObject(expected)) {
+		return assertPrimitive(expected, value);
+	}
+	return mapObjIndexed((type, key) => assertType(type, value[key]), expected);
 };
 
 module.exports = {assertType};

@@ -41,6 +41,47 @@ describe("TypeDefinition", function () {
 		assert.deepEqual(typedef.match(["a", 1]), [2, ["a", 1]]);
 	});
 
+	it("should match object templates", function () {
+		const typedef = new TypeDefinition({
+			a: Number,
+			b: [Boolean, String],
+			c: {
+				d: RegExp,
+				e: [Date, Function],
+			},
+		}, {
+			a: 1,
+			b: false,
+			c: {
+				d: /^$/,
+				e: new Date(0),
+			},
+		}, 2);
+
+		assert.deepEqual(typedef.match([{
+			a: 2,
+			b: "x",
+			c: {
+				d: /^x$/,
+				e: new Date(1),
+			},
+		}]), [1, [{
+			a: 2,
+			b: "x",
+			c: {
+				d: /^x$/,
+				e: new Date(1),
+			},
+		}, {
+			a: 1,
+			b: false,
+			c: {
+				d: /^$/,
+				e: new Date(0),
+			},
+		}]]);
+	});
+
 	it("should match default value", function () {
 		const typedef = new TypeDefinition(Object, {a: 1});
 
@@ -51,9 +92,12 @@ describe("TypeDefinition", function () {
 	it("should reject wrongly typed value", function () {
 		assert.throws(() => new TypeDefinition(Object).match([1]), TypeError);
 		assert.throws(() => new TypeDefinition([Number, String]).match([{}]), TypeError);
+		assert.throws(() => new TypeDefinition({a: Number}).match([true]), TypeError);
+		assert.throws(() => new TypeDefinition({a: Number}).match([{b: 1}]), TypeError);
 	});
 
 	it("should reject missing value", function () {
 		assert.throws(() => new TypeDefinition(Object).match([]), TypeError);
+		assert.throws(() => new TypeDefinition({a: Number}).match([{}]), TypeError);
 	});
 });

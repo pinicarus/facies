@@ -3,7 +3,7 @@
 const {assertType} = require("./assert-type");
 
 /**
- * Storeage for the internal properties for TypeDefinition instances.
+ * Storage for the internal properties of TypeDefinition instances.
  * @private
  * @type {WeakMap}
  */

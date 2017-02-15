@@ -1,3 +1,6 @@
+# 2.0.1
+  - Fix typematching when mixing multiple candidates and object templates
+
 # 2.0.0
   - Drop support of Node 4.x
   - Allow matching of variadic types

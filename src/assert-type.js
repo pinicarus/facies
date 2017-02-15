@@ -1,7 +1,7 @@
 "use strict";
 
-const isPlainObject   = require("is-plain-obj");
-const {mapObjIndexed} = require("ramda");
+const R             = require("ramda");
+const isPlainObject = require("is-plain-obj");
 
 /**
  * A mapping of type names to types.
@@ -21,24 +21,35 @@ const types = {
  * Verifies the type of a primitive value.
  * @private
  *
+ * @param {*} expected - The value expected type.
+ * @param {*} value    - The value to verify the type of.
+ *
+ * @returns {Boolean} Whether the value matches the type..
+ */
+const verifyPrimitive = function verifyPrimitive(expected, value) {
+	const actual = value === null ? null : types[typeof value];
+
+	return actual === expected || value instanceof expected;
+};
+
+/**
+ * Verifies the type of a value.
+ * @private
+ *
  * @param {*} expected - The value expected type(s).
  * @param {*} value    - The value to verify the type of.
  *
- * @returns {*}         The value.
- * @throws  {TypeError} Whenever the value is wrongly typed.
+ * @returns {Boolean} Whether the value matches the type..
  */
-const assertPrimitive = function assertPrimitive(expected, value) {
-	const actual = value === null ? null : types[typeof value];
-
-	if (Array.isArray(expected)) {
-		if (expected.some((type) => actual === type || value instanceof type)) {
-			return value;
-		}
+const verifyType = function verifyType (expected, value) {
+	switch (true) {
+		case Array.isArray(expected):
+			return expected.some((type) => verifyType(type, value));
+		case isPlainObject(expected):
+			return R.values(R.mapObjIndexed((type, key) => verifyType(type, value[key]), expected)).every(Boolean);
+		default:
+			return verifyPrimitive(expected, value);
 	}
-	else if (actual === expected || value instanceof expected) {
-		return value;
-	}
-	throw new TypeError("wrong type");
 };
 
 /**
@@ -52,10 +63,10 @@ const assertPrimitive = function assertPrimitive(expected, value) {
  * @throws  {TypeError} Whenever the value is wrongly typed.
  */
 const assertType = function assertType (expected, value) {
-	if (!isPlainObject(expected)) {
-		return assertPrimitive(expected, value);
+	if (!verifyType(expected, value)) {
+		throw new TypeError("wrong type");
 	}
-	return mapObjIndexed((type, key) => assertType(type, value[key]), expected);
+	return value;
 };
 
 module.exports = {assertType};

@@ -29,7 +29,7 @@ const types = {
 const verifyPrimitive = function verifyPrimitive(expected, value) {
 	const actual = value === null ? null : types[typeof value];
 
-	return actual === expected || value instanceof expected;
+	return actual === expected || (expected && value instanceof expected);
 };
 
 /**

@@ -75,6 +75,10 @@ describe("assertType", function () {
 		assert.doesNotThrow(() => assertType([Number, {a: [String, RegExp]}], 1));
 		assert.doesNotThrow(() => assertType([Number, {a: [String, RegExp]}], {a: "a"}));
 		assert.doesNotThrow(() => assertType([Number, {a: [String, RegExp]}], {a: /^a$/}));
+		assert.doesNotThrow(() => assertType([Number, undefined], 1));
+		assert.doesNotThrow(() => assertType([Number, undefined], undefined));
+		assert.doesNotThrow(() => assertType([undefined, Number], 1));
+		assert.doesNotThrow(() => assertType([undefined, Number], undefined));
 	});
 
 	it("should reject wrongly typed values", function () {

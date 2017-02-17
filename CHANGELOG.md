@@ -1,3 +1,6 @@
+# 2.0.2
+  - Fix typechecking against undefined type
+
 # 2.0.1
   - Fix typematching when mixing multiple candidates and object templates
 

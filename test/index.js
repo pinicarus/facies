@@ -2,18 +2,22 @@
 
 const assert = require("assert");
 
-const index = requireSrc("index");
+const facies = requireSrc("index");
 
 describe("API", function () {
 	it("should conform", function () {
-		assert(index instanceof Object);
-		assert(index.match instanceof Function);
-		assert(index.TypeDefinition instanceof Function);
+		assert(facies           instanceof Object);
+		assert(facies.Interface instanceof Function);
+		assert(facies.match     instanceof Function);
 	});
 
 	it("should be immutable", function () {
-		assert.throws(() => { index.x = true; }, TypeError);
-		assert.throws(() => { index.match = true; }, TypeError);
-		assert.throws(() => { index.TypeDefinition = true; }, TypeError);
+		assert.throws(() => { facies.x = true; }, TypeError);
+	});
+
+	it("should be currified", function () {
+		assert.equal(facies.match.length, 2);
+		assert(facies.match([]) instanceof Function);
+		assert.deepEqual(facies.match([])([]), facies.match([], []));
 	});
 });

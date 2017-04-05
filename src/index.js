@@ -1,9 +1,11 @@
 "use strict";
 
-const {TypeDefinition} = require("./type-definition");
-const {match}          = require("./match");
+const R = require("ramda");
+
+const {Interface} = require("./interface");
+const {match}     = require("./match");
 
 module.exports = Object.freeze({
-	TypeDefinition,
-	match,
+	Interface,
+	match: R.curryN(2, match),
 });

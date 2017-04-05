@@ -2,141 +2,259 @@
 
 const assert = require("assert");
 
-const {TypeDefinition} = requireSrc("type-definition");
-const {match}          = requireSrc("match");
+const {Interface} = requireSrc("interface");
+const {match}     = requireSrc("match");
 
 describe("match", function () {
-	it("should match strict definitions", function () {
-		assert.deepEqual(match([1], [
-			new TypeDefinition(Number),
-		], true), [1]);
+	describe("direct types", function () {
+		it("should match values", function () {
+			const symbol = Symbol();
+			const arrow  = () => {};
 
-		assert.deepEqual(match([1, "a"], [
-			new TypeDefinition(Number),
-			new TypeDefinition(String),
-		], true), [1, "a"]);
+			const values = match([
+				undefined,
+				null,
+				Boolean,
+				Boolean,
+				Number,
+				Number,
+				String,
+				Symbol,
+				Function,
+			], [
+				undefined,
+				null,
+				true,
+				false,
+				0,
+				1,
+				"",
+				symbol,
+				arrow,
+			]);
 
-		assert.deepEqual(match([1, "a", {b: true}], [
-			new TypeDefinition(Number),
-			new TypeDefinition(String),
-			new TypeDefinition(Object),
-		], true), [1, "a", {b: true}]);
+			assert.deepEqual(values, [
+				undefined,
+				null,
+				true,
+				false,
+				0,
+				1,
+				"",
+				symbol,
+				arrow,
+			]);
+		});
 
-		assert.deepEqual(match([1, "a"], [
-			new TypeDefinition([Number, String]),
-			new TypeDefinition([Number, String]),
-		], true), [1, "a"]);
+		it("should match values w/ default values", function () {
+			const types = [
+				[undefined, 42],
+				[null,      42],
+				[Boolean,   42],
+				[Boolean,   42],
+				[Number,    42],
+				[Number,    42],
+				[String,    42],
+				[Symbol,    42],
+				[Function,  42],
+			];
 
-		assert.deepEqual(match([1, 2, 3], [
-			new TypeDefinition(Number, 0, 3),
-		], true), [[1, 2, 3]]);
+			const values = match(types, new Array(types.length).fill(/^$/));
 
-		assert.deepEqual(match([{
-			a: 1,
-			b: false,
-			c: {
-				d: /^$/,
-				e: new Date(0),
-			},
-		}], [
-			new TypeDefinition({
-				a: Number,
-				b: [Boolean, String],
-				c: {
-					d: RegExp,
-					e: [Date, Function],
-				},
+			assert.equal(values.length, types.length);
+			assert(values.every((value) => value === 42));
+		});
+
+		it("should match all default values", function () {
+			const values = match([
+				[undefined, 42],
+				[null,      42],
+				[Boolean,   42],
+				[Boolean,   42],
+				[Number,    42],
+				[Number,    42],
+				[String,    42],
+				[Symbol,    42],
+				[Function,  42],
+			], []);
+
+			assert.equal(values.length, 9);
+			assert(values.every((value) => value === 42));
+		});
+	});
+
+	describe("interface types", function () {
+		it("should match values", function () {
+			const symbol = Symbol();
+			const arrow  = () => {};
+
+			const values = match([
+				Interface(undefined),
+				Interface(null),
+				Interface(Boolean),
+				Interface(Boolean),
+				Interface(Number),
+				Interface(Number),
+				Interface(String),
+				Interface(Symbol),
+				Interface(Function),
+			], [
+				undefined,
+				null,
+				true,
+				false,
+				0,
+				1,
+				"",
+				symbol,
+				arrow,
+			]);
+
+			assert.deepEqual(values, [
+				undefined,
+				null,
+				true,
+				false,
+				0,
+				1,
+				"",
+				symbol,
+				arrow,
+			]);
+		});
+
+		it("should match values w/ default values", function () {
+			const types = [
+				[Interface(undefined), 42],
+				[Interface(null),      42],
+				[Interface(Boolean),   42],
+				[Interface(Boolean),   42],
+				[Interface(Number),    42],
+				[Interface(Number),    42],
+				[Interface(String),    42],
+				[Interface(Symbol),    42],
+				[Interface(Function),  42],
+			];
+
+			const values = match(types, new Array(types.length).fill(/^$/));
+
+			assert.equal(values.length, types.length);
+			assert(values.every((value) => value === 42));
+		});
+
+		it("should match all default values", function () {
+			const values = match([
+				[Interface(undefined), 42],
+				[Interface(null),      42],
+				[Interface(Boolean),   42],
+				[Interface(Boolean),   42],
+				[Interface(Number),    42],
+				[Interface(Number),    42],
+				[Interface(String),    42],
+				[Interface(Symbol),    42],
+				[Interface(Function),  42],
+			], []);
+
+			assert.equal(values.length, 9);
+			assert(values.every((value) => value === 42));
+		});
+	});
+
+	it("should match values against multiple interfaces", function () {
+		const symbol = Symbol();
+		const arrow  = () => {};
+
+		const values = match([
+			[undefined],
+			[Interface(Boolean, null)],
+			[Interface(Number, Boolean)],
+			[Interface(Boolean, Number)],
+			[Interface(Number)],
+			[Interface(String, Number)],
+			[Interface(undefined, String)],
+			[Interface(Symbol, Function)],
+			[Interface(null, Function)],
+		], [
+			undefined,
+			null,
+			true,
+			false,
+			0,
+			1,
+			"",
+			symbol,
+			arrow,
+		]);
+
+		assert.deepEqual(values, [
+			undefined,
+			null,
+			true,
+			false,
+			0,
+			1,
+			"",
+			symbol,
+			arrow,
+		]);
+	});
+
+	it("should match values against multiple interfaces w/ default values", function () {
+		const values = match([
+			[Interface(RegExp, Date), 42],
+			[Interface(RegExp, Date), 42],
+			[Interface(RegExp, Date), 42],
+			[Interface(RegExp, Date), 42],
+			[Interface(RegExp, Date), 42],
+			[Interface(RegExp, Date), 42],
+			[Interface(RegExp, Date), 42],
+			[Interface(RegExp, Date), 42],
+			[Interface(RegExp, Date), 42],
+		], [
+			undefined,
+			null,
+			true,
+			false,
+			0,
+			1,
+			"",
+			Symbol(),
+			() => {},
+		]);
+
+		assert.equal(values.length, 9);
+		assert(values.every((value) => value === 42));
+	});
+
+	it("should skip values matching their default", function () {
+		const values = match([
+			Interface(Number),
+			[Interface(String),  "default"],
+			[Interface(Boolean), true],
+			Interface({
+				forEach: Function,
+				map:     Function,
+				reduce:  Function,
 			}),
-		], true), [{
-			a: 1,
-			b: false,
-			c: {
-				d: /^$/,
-				e: new Date(0),
-			},
-		}]);
+		], [
+			42,
+			[33],
+		]);
+
+		assert.deepEqual(values, [42, "default", true, [33]]);
 	});
 
-	it("should match relaxed definitions", function () {
-		assert.deepEqual(match([1, "a", {b: true}, /^x$/], [
-			new TypeDefinition(Number),
-		], false), [1, "a", {b: true}, /^x$/]);
+	describe("errors", function () {
+		const check = (type, message) => (error) => error instanceof type && error.message === message;
 
-		assert.deepEqual(match([1, "a", {b: true}, /^x$/], [
-			new TypeDefinition(Number),
-			new TypeDefinition(String),
-		], false), [1, "a", {b: true}, /^x$/]);
+		it("should fail to match invalid interface w/o default value", function () {
+			assert.throws(() => match([Number],         ["foo"]),    check(TypeError, "wrong type for argument #1"));
+			assert.throws(() => match([Number, String], [1, 2]),     check(TypeError, "wrong type for argument #2"));
+			assert.throws(() => match([Number, String], ["foo", 1]), check(TypeError, "wrong type for argument #1"));
+		});
 
-		assert.deepEqual(match([1, "a", {b: true}, /^x$/], [
-			new TypeDefinition(Number),
-			new TypeDefinition(String),
-			new TypeDefinition(Object),
-		], false), [1, "a", {b: true}, /^x$/]);
-
-		assert.deepEqual(match([1, "a", /^x$/], [
-			new TypeDefinition([Number, String]),
-			new TypeDefinition([Number, String]),
-		], false), [1, "a", /^x$/]);
-
-		assert.deepEqual(match([1, 2], [
-			new TypeDefinition(Number, 0, 3),
-		], true), [[1, 2, 0]]);
-
-		assert.deepEqual(match([{
-			a: 1,
-			b: false,
-			c: {
-				d: /^$/,
-				e: new Date(0),
-			},
-		}, /^x$/], [
-			new TypeDefinition({
-				a: Number,
-				b: [Boolean, String],
-				c: {
-					d: RegExp,
-					e: [Date, Function],
-				},
-			}),
-		], false), [{
-			a: 1,
-			b: false,
-			c: {
-				d: /^$/,
-				e: new Date(0),
-			},
-		}, /^x$/]);
-	});
-
-	it("should reject extra value with strict definitions", function () {
-		assert.throws(() => match([1, "a"], [
-			new TypeDefinition(Number),
-		], true), TypeError);
-
-		assert.throws(() => match([1, "a", {b: true}], [
-			new TypeDefinition(Number),
-			new TypeDefinition(String),
-		], true), TypeError);
-
-		assert.throws(() => match([1, "a", {b: true}, /^x$/], [
-			new TypeDefinition(Number),
-			new TypeDefinition(String),
-			new TypeDefinition(Object),
-		], true), TypeError);
-	});
-
-	it("should allow optional values everywhere", function () {
-		assert.deepEqual(match([1, "a", "b", 2], [
-			new TypeDefinition(RegExp, /^x$/),
-			new TypeDefinition(Number),
-			new TypeDefinition(String, "c", 3),
-			new TypeDefinition(Array, [true]),
-			new TypeDefinition(Number),
-		], true), [/^x$/, 1, ["a", "b", "c"], [true], 2]);
-
-		assert.deepEqual(match([1, "a", {a: 1}], [
-			new TypeDefinition([Number, String], 2, 3),
-			new TypeDefinition({a: Number}, {a: 0}, 2),
-		], true), [[1, "a", 2], [{a: 1}, {a: 0}]]);
+		it("should fail to match missing value", function () {
+			assert.throws(() => match([Number, Number], [1]), check(TypeError, "missing argument #2"));
+		});
 	});
 });

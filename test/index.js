@@ -9,6 +9,7 @@ describe("API", function () {
 		assert(facies           instanceof Object);
 		assert(facies.Interface instanceof Function);
 		assert(facies.match     instanceof Function);
+		assert.equal(typeof facies.any, "symbol");
 	});
 
 	it("should be immutable", function () {

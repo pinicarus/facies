@@ -51,15 +51,20 @@ matching or from a literal object describing the expected interface. So both
 
 Interface definitions can be given in an array where the last value will be the
 default value used if none of the other values match the corresponding value.
-Multiple interface definitions can also be bundled together using the
+Multiple interface definitions can also be bundled together using the variadic
 `Interface` construct, which responds to the `instanceof` operator:
 
 ```javascript
-[]         instanceof Interface({forEach: Function}); // true
-new Map()  instanceof Interface({forEach: Function}); // true
-/^$/       instanceof Interface(RegExp, Date);        // true
-new Date() instanceof Interface(RegExp, Date);        // true
+[]         instanceof facies.Interface({forEach: Function}); // true
+new Map()  instanceof facies.Interface({forEach: Function}); // true
+/^$/       instanceof facies.Interface(RegExp, Date);        // true
+new Date() instanceof facies.Interface(RegExp, Date);        // true
 ```
 
-If actual values do not match the expected interface definition, `facies.match` will
-also throw a `TypeError`.
+If actual values do not match the expected interface definition, `facies.match`
+will also throw a `TypeError`. If more values are given than the result of
+matching (including default values), `facies.match` will also throw a
+`TypeError`.
+
+The `facies.match` function is currified using [Ramda](http://ramdajs.com/), so
+that it can be partially applied to the interface expectation if needed.

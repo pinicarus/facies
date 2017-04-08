@@ -13,9 +13,11 @@ const {Interface} = require("./interface");
  * @throws  {TypeError} Whenever a value does not match any of its interfaces and no default value is available.
  */
 const match = function match(expected, values) {
-	const _values = Array.from(values);
+	const _values   = Array.from(values);
+	const _expected = Array.from(expected);
+	const diff      = Math.max(0, _values.length - _expected.length);
 
-	return Array.from(expected).map((type, index) => {
+	const matched = _expected.map((type, index) => {
 		const types        = Array.isArray(type) ? type : [type];
 		const hasDefault   = types.length > 1;
 		const defaultValue = hasDefault ? types.pop() : undefined;
@@ -32,11 +34,16 @@ const match = function match(expected, values) {
 			throw new TypeError(`wrong type for argument #${index + 1}`);
 		}
 
-		if (!hasDefault) {
-			throw new TypeError(`missing argument #${index + 1}`);
+		if (hasDefault) {
+			return defaultValue;
 		}
-		return defaultValue;
+		throw new TypeError(`missing argument #${index + 1}`);
 	});
+
+	if (_values.length > diff) {
+		throw new TypeError(`argument${_values.length > 1 ? "s" : ""} not matched: ${_values}`);
+	}
+	return matched;
 };
 
 module.exports = {match};

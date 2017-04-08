@@ -1,4 +1,4 @@
-# 3.0.1
+# 3.0.2
   - Allow a weaker form of duck type checking
   - Simplify checking in a single uniform way
 

@@ -10,9 +10,8 @@
 
 ## Features
 
-- Type matching
+- Duck type matching
 - Default values
-- Multiple values matching
 
 See the [changelog](https://github.com/pinicarus/facies/blob/master/CHANGELOG.md) and the
 [API reference](https://github.com/pinicarus/facies/blob/master/API.md)
@@ -34,10 +33,10 @@ keyword:
 const facies = require("facies");
 
 const target = function () {
-	const parameters = facies.match(arguments, [
-		new facies.TypeDefinition(Number),
-		new facies.TypeDefinition(String, "a"),
-	]);
+	const parameters = facies.match([
+		Number,
+		[String, "a"],
+	], arguments);
 
 	// parameters is an array:
 	// - [0] is a Number
@@ -45,27 +44,22 @@ const target = function () {
 };
 ```
 
-It works by matching the given values against a list of type definitions.
-Type definitions are constructed from a type constructor for exact matching or
-from an array of type constructors to match on of any types.
+It works by matching the given values against a list of interface definitions.
+Interface definitions are constructed either from a type constructor for exact
+matching or from a literal object describing the expected interface. So both
+`String` and `{length: Function}` will match strings.
 
-Optionally, they may be followed by a default value in case no actual value can
-be matched. Default values must be `null` or match the type constructor or
-`facies.match` will throw a `TypeError`.
-
-If actual values do not match the expected type definition, `facies.match` will
-also throw a `TypeError`.
-
-Type definitions may also have a third optional argument, which is the number
-of successive values to match:
+Interface definitions can be given in an array where the last value will be the
+default value used if none of the other values match the corresponding value.
+Multiple interface definitions can also be bundled together using the
+`Interface` construct, which responds to the `instanceof` operator:
 
 ```javascript
-// matches three numbers, using 0 if less are given.
-new TypeDefinition(Number, 0, 3)
+[]         instanceof Interface({forEach: Function}); // true
+new Map()  instanceof Interface({forEach: Function}); // true
+/^$/       instanceof Interface(RegExp, Date);        // true
+new Date() instanceof Interface(RegExp, Date);        // true
 ```
 
-By default, any value not matched by a type definition will be appended to the
-result value of `facies.match`. This can be mitigate by providing a third
-boolean argument indicating whether the type definitions are supposed to match
-the whole set of given values. In `true`, extra values will be considered an
-error and `facies.match` will throw a `TypeError`.
+If actual values do not match the expected interface definition, `facies.match` will
+also throw a `TypeError`.

@@ -1,41 +1,42 @@
 "use strict";
 
-const {TypeDefinition} = require("./type-definition");
-const {assertType}     = require("./assert-type");
+const {Interface} = require("./interface");
 
 /**
- * @typedef {Object} Iterable - An iterable object
- * @property {Function} @@iterator - The function returning an iterator over
- * the iterable.
- */
-
-/**
- * Filters optional and required parameters.
- * Missing optional parameters will be replaced by `undefined'.
+ * Ensures the given values match the expected interfaces.
  *
- * @param {Iterable}              values         - The values to filter.
- * @param {Array<TypeDefinition>} definitions    - The type definitions to filter with.
- * @param {Boolean}               [strict=false] - Whether all values have to be filtered.
+ * @param {Array<(*|Array<*>)>} expected - An array-like of interfaces w/ optional default, to match the values against.
+ * @param {Array<*>}            values   - An array-like of values to match.
  *
- * @returns {Array<*>}  The filtered values.
- * @throws  {TypeError} Whenever a required parameter is missing.
- * @throws  {TypeError} Whenever a required parameter has the wrong type.
- * @throws  {TypeError} Whenever there are pending values with strict filter.
+ * @returns {Array<*>}  The matched values or their default values.
+ * @throws  {TypeError} Whenever not enough values are given and no default values are available to complete.
+ * @throws  {TypeError} Whenever a value does not match any of its interfaces and no default value is available.
  */
-const match = function match(values, definitions, strict) {
-	const pending    = Array.from(values);
-	const parameters = definitions.map((definition) => {
-		const [count, values] = assertType(TypeDefinition, definition).match(pending);
+const match = function match(expected, values) {
+	const _values = Array.from(values);
 
-		pending.splice(0, count);
-		return values.length > 1 ? values : values[0];
+	return Array.from(expected).map((type, index) => {
+		const types        = Array.isArray(type) ? type : [type];
+		const hasDefault   = types.length > 1;
+		const defaultValue = hasDefault ? types.pop() : undefined;
+
+		if (_values.length > 0) {
+			const value = _values[0];
+
+			if (types.some((candidate) => value instanceof Interface(candidate))) {
+				return _values.shift();
+			}
+			if (hasDefault) {
+				return defaultValue;
+			}
+			throw new TypeError(`wrong type for argument #${index + 1}`);
+		}
+
+		if (!hasDefault) {
+			throw new TypeError(`missing argument #${index + 1}`);
+		}
+		return defaultValue;
 	});
-
-	if (strict && pending.length > 0) {
-		throw new TypeError(`${pending.length} extra parameters`);
-	}
-
-	return parameters.concat(pending);
 };
 
-module.exports= {match};
+module.exports = {match};

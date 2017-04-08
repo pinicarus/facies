@@ -1,3 +1,7 @@
+# 3.0.1
+  - Allow a weaker form of duck type checking
+  - Simplify checking in a single uniform way
+
 # 2.0.2
   - Fix typechecking against undefined type
 

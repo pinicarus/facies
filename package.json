@@ -1,6 +1,6 @@
 {
 	"name":        "facies",
-	"version":     "2.0.2",
+	"version":     "3.0.1",
 	"description": "A featureful function parameters signature module",
 	"author":      "Pierre-Nicolas Clauss",
 	"license":     "WTFPL",
@@ -25,7 +25,8 @@
 	},
 
 	"scripts": {
-		"doc":         "jsdoc2md --heading-depth 1 --files src/**.js > API.md",
+		"predoc":      "./generate-jsdoc-config.sh src > .jsdoc2md.json",
+		"doc":         "jsdoc2md > API.md",
 		"lint":        "eslint . --ignore-path .gitignore",
 		"unittest":    "mocha --opts ./.mocha.opts",
 		"unitcov":     "istanbul cover -- _mocha --opts ./.mocha.opts",
@@ -41,10 +42,10 @@
 	},
 
 	"devDependencies": {
-		"coveralls":         "2.11.15",
-		"eslint":            "3.15.0",
+		"coveralls":         "2.13.0",
+		"eslint":            "3.19.0",
 		"istanbul":          "0.4.5",
-		"jsdoc-to-markdown": "2.0.1",
+		"jsdoc-to-markdown": "3.0.0",
 		"mocha":             "3.2.0"
 	}
 }

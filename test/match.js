@@ -46,25 +46,6 @@ describe("match", function () {
 			]);
 		});
 
-		it("should match values w/ default values", function () {
-			const types = [
-				[undefined, 42],
-				[null,      42],
-				[Boolean,   42],
-				[Boolean,   42],
-				[Number,    42],
-				[Number,    42],
-				[String,    42],
-				[Symbol,    42],
-				[Function,  42],
-			];
-
-			const values = match(types, new Array(types.length).fill(/^$/));
-
-			assert.equal(values.length, types.length);
-			assert(values.every((value) => value === 42));
-		});
-
 		it("should match all default values", function () {
 			const values = match([
 				[undefined, 42],
@@ -121,25 +102,6 @@ describe("match", function () {
 				symbol,
 				arrow,
 			]);
-		});
-
-		it("should match values w/ default values", function () {
-			const types = [
-				[Interface(undefined), 42],
-				[Interface(null),      42],
-				[Interface(Boolean),   42],
-				[Interface(Boolean),   42],
-				[Interface(Number),    42],
-				[Interface(Number),    42],
-				[Interface(String),    42],
-				[Interface(Symbol),    42],
-				[Interface(Function),  42],
-			];
-
-			const values = match(types, new Array(types.length).fill(/^$/));
-
-			assert.equal(values.length, types.length);
-			assert(values.every((value) => value === 42));
 		});
 
 		it("should match all default values", function () {
@@ -199,33 +161,6 @@ describe("match", function () {
 		]);
 	});
 
-	it("should match values against multiple interfaces w/ default values", function () {
-		const values = match([
-			[Interface(RegExp, Date), 42],
-			[Interface(RegExp, Date), 42],
-			[Interface(RegExp, Date), 42],
-			[Interface(RegExp, Date), 42],
-			[Interface(RegExp, Date), 42],
-			[Interface(RegExp, Date), 42],
-			[Interface(RegExp, Date), 42],
-			[Interface(RegExp, Date), 42],
-			[Interface(RegExp, Date), 42],
-		], [
-			undefined,
-			null,
-			true,
-			false,
-			0,
-			1,
-			"",
-			Symbol(),
-			() => {},
-		]);
-
-		assert.equal(values.length, 9);
-		assert(values.every((value) => value === 42));
-	});
-
 	it("should skip values matching their default", function () {
 		const values = match([
 			Interface(Number),
@@ -255,6 +190,18 @@ describe("match", function () {
 
 		it("should fail to match missing value", function () {
 			assert.throws(() => match([Number, Number], [1]), check(TypeError, "missing argument #2"));
+		});
+
+		it("should fail if not all values match", function () {
+			assert.throws(() => match([
+				Number,
+				[String, "foo"],
+			], [1, 2]), check(TypeError, "argument not matched: 2"));
+			assert.throws(() => match([
+				[Number, 42],
+				String,
+				[Number, 33],
+			], [1, "foo", "bar", "baz"]), check(TypeError, "arguments not matched: bar,baz"));
 		});
 	});
 });

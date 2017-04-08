@@ -2,7 +2,10 @@
 
 const assert = require("assert");
 
-const {Interface} = requireSrc("interface");
+const {
+	Interface,
+	any,
+} = requireSrc("interface");
 
 describe("interface", function () {
 	it("should match primitive values", function () {
@@ -88,6 +91,27 @@ describe("interface", function () {
 		assert((() => {}) instanceof Interface(Interface(Interface(Function))));
 
 		assert(true       instanceof Interface(Number, Interface(String, Interface(Symbol, Boolean))));
+	});
+
+	it("should match the wildcard", function () {
+		assert(any           instanceof Interface(any));
+		assert(undefined     instanceof Interface(any));
+		assert(null          instanceof Interface(any));
+		assert(true          instanceof Interface(any));
+		assert(false         instanceof Interface(any));
+		assert(0             instanceof Interface(any));
+		assert(1             instanceof Interface(any));
+		assert(""            instanceof Interface(any));
+		assert(Symbol()      instanceof Interface(any));
+		assert((() => {})    instanceof Interface(any));
+		assert({}            instanceof Interface(any));
+		assert([]            instanceof Interface(any));
+		assert(new Date()    instanceof Interface(any));
+		assert(new RegExp()  instanceof Interface(any));
+		assert(new Map()     instanceof Interface(any));
+		assert(new Set()     instanceof Interface(any));
+		assert(new WeakMap() instanceof Interface(any));
+		assert(new WeakSet() instanceof Interface(any));
 	});
 
 	it("should fail to match invalid primitive values", function () {

@@ -4,6 +4,12 @@ const R             = require("ramda");
 const isPlainObject = require("is-plain-obj");
 
 /**
+ * A wildcard to match any value.
+ * @type Symbol
+ */
+const any = Symbol("*");
+
+/**
  * A mapping of type names to types.
  * @private
  * @enum {*}
@@ -62,12 +68,14 @@ const verifyPrimitive = function verifyPrimitive(expected, value) {
  */
 const verifyType = function verifyType(expected, value) {
 	switch (true) {
+		case expected === any:
+			return true;
+		case R.isNil(expected):
+			return expected === value;
 		case Array.isArray(expected):
 			return Array.isArray(value) && expected.every((type, index) => verifyType(type, value[index]));
 		case isPlainObject(expected):
 			return !R.isNil(value) && reduceObject((ok, type, key) => ok && verifyType(type, value[key]), true, expected);
-		case R.isNil(expected):
-			return expected === value;
 		default:
 			return verifyPrimitive(expected, value);
 	}
@@ -100,4 +108,7 @@ const Interface = function Interface(...expected) {
 	};
 };
 
-module.exports = {Interface};
+module.exports = {
+	Interface,
+	any,
+};

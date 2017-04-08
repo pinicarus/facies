@@ -1,3 +1,11 @@
+# Constants
+
+<dl>
+<dt><a href="#any">any</a> : <code>Symbol</code></dt>
+<dd><p>A wildcard to match any value.</p>
+</dd>
+</dl>
+
 # Functions
 
 <dl>
@@ -9,6 +17,12 @@
 </dd>
 </dl>
 
+<a name="any"></a>
+
+# any : <code>Symbol</code>
+A wildcard to match any value.
+
+**Kind**: global constant  
 <a name="Interface"></a>
 
 # Interface(...expected) ⇒ <code>Object</code>
